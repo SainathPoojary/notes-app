@@ -57,7 +57,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             .cookie("access_token", token, {
             httpOnly: true,
             expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
-            sameSite: true,
+            sameSite: "lax",
         })
             .json({
             name: user.name,
@@ -74,11 +74,17 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    ``;
     try {
         const { email, password } = req.body;
+        console.log(req.body);
         // validate all fields
         if (!(email && password))
-            res.status(400).send("All fields required");
+            return res.status(400).json({
+                status: 400,
+                code: "missing-fields",
+                msg: "All fields required",
+            });
         // get user from database with notes
         const user = yield prisma_1.default.user.findUnique({
             where: { email },
@@ -102,7 +108,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             .cookie("access_token", token, {
             httpOnly: true,
             expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-            sameSite: true,
+            sameSite: "lax",
         })
             .json({
             name: user.name,

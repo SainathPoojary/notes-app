@@ -51,7 +51,7 @@ export const register = async (req: Request, res: Response) => {
       .cookie("access_token", token, {
         httpOnly: true,
         expires: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
-        sameSite: true,
+        sameSite: "lax",
       })
       .json({
         name: user.name,
@@ -67,11 +67,19 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
+  ``;
   try {
     const { email, password } = req.body;
 
+    console.log(req.body);
+
     // validate all fields
-    if (!(email && password)) res.status(400).send("All fields required");
+    if (!(email && password))
+      return res.status(400).json({
+        status: 400,
+        code: "missing-fields",
+        msg: "All fields required",
+      });
 
     // get user from database with notes
     const user = await prisma.user.findUnique({
@@ -98,7 +106,7 @@ export const login = async (req: Request, res: Response) => {
       .cookie("access_token", token, {
         httpOnly: true,
         expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days
-        sameSite: true,
+        sameSite: "lax",
       })
       .json({
         name: user.name,
